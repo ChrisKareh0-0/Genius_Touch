@@ -1,26 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --genius-dark: #3A2B20;
+  --genius-brown: #7E6A52;
+  --genius-tan: #B89C82;
+  --genius-cream: #DACFB6;
+  --genius-light: #F9F5ED;
+  --foreground: var(--genius-cream);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
 body {
-  background: var(--background);
+  background-image: url('/velvet.jpg');
+  /* background-color: rgba(58, 43, 32, 0.85);  */
+  background-blend-mode: soft-light; /* Changed to soft-light for velvet effect */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--genius-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--genius-tan);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--genius-brown);
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Luxury hover effects */
+.luxury-hover {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(58, 43, 32, 0.1); /* This is a shadow using the dark color, which is fine for effect */
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: transform, opacity;
+}
+
+.float-animate {
+  animation: float 1.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Lower blur for glassmorphism */
+.glass-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Add this new class for velvet background */
+.velvet-bg {
+  background-image: url('/leather.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: soft-light;
+  background-color: rgba(58, 43, 32, 0.7);
 }
