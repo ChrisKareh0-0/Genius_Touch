@@ -14,7 +14,7 @@ const CigarIcon = ({ size = 36, color = '#7E6A52' }) => (
 
 type Category = {
   name: string;
-  icon: FC<{ size?: number; strokeWidth?: number; color?: string }>;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
   image: string;
   description: string;
   clients: string[];
@@ -27,7 +27,39 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showExpertiseDrawer, setShowExpertiseDrawer] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [scrollY, setScrollY] = useState(0);
+  const [leatherBoxVisible, setLeatherBoxVisible] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  
+  // Array of video sources
+  const videoSources = [
+    '/luxury-packaging-video-1.mp4.mp4',
+    '/luxury-packaging-video-2.mp4.mp4',
+    '/luxury-packaging-video-3.mp4.mp4',
+    // Add more videos as needed
+  ];
+  
+  useEffect(() => { 
+    setMounted(true); 
+    
+    // Log video sources for debugging
+    console.log('Video sources:', videoSources);
+    
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setScrollY(scrollPosition);
+      
+      // Show leather box when scrolled past 200px for earlier appearance
+      if (scrollPosition > 200) {
+        setLeatherBoxVisible(true);
+      } else {
+        setLeatherBoxVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [videoSources]);
   const categories: Category[] = [
     { name: 'Cigars', icon: (props) => <CigarIcon {...props} />, image: '/demo/cigars.jpg', description: 'Premium cigar packaging solutions', clients: ['Cigar Co. A', 'Cigar Brand B', 'Luxury Cigars Ltd.'] },
     { name: 'Alcohol & Drinks', icon: (props) => <Wine {...props} />, image: '/demo/alcohol.jpg', description: 'Luxury beverage packaging', clients: ['Fine Spirits Inc.', 'Wine Masters', 'Elite Distillers'] },
@@ -49,16 +81,38 @@ export default function Home() {
     }
   };
 
+  const handleVideoEnd = () => {
+    setCurrentVideoIndex((prevIndex) => 
+      (prevIndex + 1) % videoSources.length
+    );
+  };
+
   return (
     <div className="min-h-screen text-genius-light font-sans">
+      {/* Leather Box Design Image */}
+      <div className={`leather-box-container left ${leatherBoxVisible ? 'visible' : ''}`}>
+        <img 
+          src="/leather box design.png" 
+          alt="Leather Box Design" 
+          className="leather-box-image"
+          style={{
+            transform: `translateX(${leatherBoxVisible ? 0 : -100}%)`,
+            opacity: leatherBoxVisible ? 1 : 0,
+            transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        />
+      </div>
+      
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-genius-brown/80 backdrop-blur-xl z-50 border-b border-genius-tan/30 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-genius-light rounded-full flex items-center justify-center shadow-md">
-                <span style={{color: "#3A2B20"}} className="text-genius-dark text-sm font-serif font-semibold">G</span>
-              </div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/GT LOGO.png" 
+                alt="GeniusTouch Logo" 
+                className="h-10 w-auto shadow-md"
+              />
               <span style={{color: "#3A2B20"}} className="text-genius-light font-serif text-xl font-semibold">GeniusTouch</span>
             </div>
             {/* Desktop Nav */}
@@ -102,6 +156,14 @@ export default function Home() {
               >
                 <X size={32} />
               </button>
+              <div className="flex items-center space-x-3 mb-4">
+                <img 
+                  src="/GT LOGO.png" 
+                  alt="GeniusTouch Logo" 
+                  className="h-8 w-auto shadow-md"
+                />
+                <span className="text-genius-dark font-serif text-lg font-semibold">GeniusTouch</span>
+              </div>
               <a href="#about" className="text-genius-dark font-serif text-lg font-medium hover:text-genius-brown transition-colors text-center" onClick={() => setShowMobileNav(false)}>Company Profile</a>
               <button
                 type="button"
@@ -120,7 +182,88 @@ export default function Home() {
         )}
       </nav>
 
-      {/* Hero Section */}
+      {/* Video Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden video-hero-section">
+        {/* Video Background */}
+        <div className="absolute inset-0 w-full h-full z-0">
+          {/* Fallback background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-genius-dark via-genius-brown to-genius-tan z-0"></div>
+          
+          <video
+            key={currentVideoIndex}
+            autoPlay
+            muted
+            playsInline
+            onEnded={handleVideoEnd}
+            onError={(e) => console.error('Video error:', e)}
+            onLoadStart={() => console.log('Video loading started:', videoSources[currentVideoIndex])}
+            onLoadedData={() => console.log('Video loaded successfully:', videoSources[currentVideoIndex])}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ 
+              filter: 'brightness(0.4) contrast(1.2)',
+              zIndex: 5
+            }}
+          >
+            <source src={videoSources[currentVideoIndex]} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/30 z-10"></div>
+        </div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 text-center px-6 max-w-6xl mx-auto video-hero-content">
+          <div className="mb-8">
+            <h1 className="text-6xl md:text-8xl font-serif font-light text-genius-light mb-8 leading-tight drop-shadow-2xl video-hero-title text-glow">
+              Crafting
+              <span className="block text-genius-cream font-medium">Excellence</span>
+            </h1>
+            <p className="text-2xl md:text-3xl text-genius-cream max-w-4xl mx-auto leading-relaxed mb-12 drop-shadow-lg video-hero-subtitle">
+              Where every detail tells a story of luxury, innovation, and timeless elegance
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center video-hero-buttons">
+            <button
+              className="bg-genius-light/20 backdrop-blur-xl text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/30 hover:text-genius-cream luxury-hover shadow-2xl border border-genius-cream/30 text-lg"
+              onClick={() => setShowExpertiseModal(true)}
+            >
+              Discover Our Craft
+            </button>
+            <button
+              className="border-2 border-genius-light/60 text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/20 hover:text-genius-cream luxury-hover shadow-2xl bg-black/20 backdrop-blur-xl text-lg"
+              onClick={handleScrollToContact}
+            >
+              Start Your Journey
+            </button>
+          </div>
+        </div>
+        
+        {/* Video Progress Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <div className="flex space-x-2">
+            {videoSources.map((_, index) => (
+              <div
+                key={index}
+                className={`w-3 h-3 rounded-full transition-all duration-500 ${
+                  index === currentVideoIndex 
+                    ? 'bg-genius-cream scale-125' 
+                    : 'bg-genius-cream/40'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-genius-cream/60 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-genius-cream/60 rounded-full mt-2 animate-pulse"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Original Hero Section */}
       <section className="pt-40 pb-20 px-6 flex flex-col justify-center items-center min-h-[60vh] fade-in-up">
         <div className="max-w-4xl w-full mx-auto text-center rounded-3xl velvet-bg backdrop-blur-xl border border-genius-cream/40 shadow-2xl p-12 relative z-20">
           <div className="mb-8">
@@ -149,7 +292,7 @@ export default function Home() {
         </div>
         {/* Expertise Drawer Toggle Button */}
         <button
-          className="relative z-30 -mt-6 mb-2 flex items-center justify-center w-14 h-14 min-w-[44px] min-h-[44px] rounded-full border border-genius-tan/40 shadow-xl hover:bg-genius-brown/80 transition-colors"
+          className="relative z-[60] -mt-6 mb-2 flex items-center justify-center w-14 h-14 min-w-[44px] min-h-[44px] rounded-full border border-genius-tan/40 shadow-xl hover:bg-genius-brown/80 transition-colors"
           style={{
             background: `url('/leather.jpg') center center / cover no-repeat, rgba(255,255,255,0.82)`,
             backgroundBlendMode: 'multiply',
@@ -258,7 +401,9 @@ export default function Home() {
                     }}
                   >
                     <div className="flex items-center space-x-4">
-                      <span className="text-3xl text-genius-brown drop-shadow">{category.icon}</span>
+                      <span className="text-3xl text-genius-brown drop-shadow">
+                        <category.icon size={32} strokeWidth={1.5} />
+                      </span>
                       <span className="text-lg font-serif font-medium text-genius-dark">{category.name}</span>
                     </div>
                     <button
@@ -370,10 +515,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto ">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-genius-light rounded-full flex items-center justify-center shadow-md">
-                  <span className="text-genius-dark text-sm font-serif font-semibold">G</span>
-                </div>
+              <div className="flex items-center space-x-3 mb-4">
+                <img 
+                  src="/GT LOGO.png" 
+                  alt="GeniusTouch Logo" 
+                  className="h-8 w-auto shadow-md"
+                />
                 <span className="font-serif text-xl font-semibold text-genius-cream">GeniusTouch</span>
               </div>
               <p className="text-genius-cream/80 text-sm">
