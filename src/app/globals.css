@@ -238,4 +238,7 @@ body {
   .leather-box-container {
     display: none;
   }
+  .cornerImage {
+    display: none;
+  }
 }

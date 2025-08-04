@@ -26,9 +26,9 @@ export default function Home() {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
   const [mounted, setMounted] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
-  const [showExpertiseDrawer, setShowExpertiseDrawer] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [leatherBoxVisible, setLeatherBoxVisible] = useState(false);
+  const [cornerImageVisible, setCornerImageVisible] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
   // Array of video sources
@@ -54,6 +54,13 @@ export default function Home() {
         setLeatherBoxVisible(true);
       } else {
         setLeatherBoxVisible(false);
+      }
+      
+      // Show corner image when scrolled past 300px
+      if (scrollPosition > 300) {
+        setCornerImageVisible(true);
+      } else {
+        setCornerImageVisible(false);
       }
     };
 
@@ -103,8 +110,25 @@ export default function Home() {
         />
       </div>
       
+      {/* Corner Photo */}
+      <div className="fixed top-0 right-0 z-40 pointer-events-none cornerImage" style={{ transform: 'translateX(80px)' }}>
+        <img 
+          src="/corner photo.png" 
+          alt="Corner Photo" 
+          className="h-152 w-auto shadow-lg"
+          style={{
+            transform: `translateX(${cornerImageVisible ? 0 : 100}%)`,
+            opacity: cornerImageVisible ? 1 : 0,
+            transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+            border: 'none',
+            outline: 'none',
+            background: 'transparent',
+          }}
+        />
+      </div>
+      
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-genius-brown/80 backdrop-blur-xl z-50 border-b border-genius-tan/30 shadow-lg">
+      <nav className="fixed top-0 w-full bg-genius-brown/80 backdrop-blur-xl z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -113,21 +137,21 @@ export default function Home() {
                 alt="GeniusTouch Logo" 
                 className="h-10 w-auto shadow-md"
               />
-              <span style={{color: "#3A2B20"}} className="text-genius-light font-serif text-xl font-semibold">GeniusTouch</span>
+              <span style={{color: "#F5F5DC"}} className="text-genius-light font-serif text-xl font-semibold">GeniusTouch</span>
             </div>
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#about" style={{color: "#3A2B20"}} className="text-genius-cream font-serif hover:text-genius-light transition-colors font-medium">Company Profile  </a>
+              <a href="#about" style={{color: "#F5F5DC"}} className="text-genius-cream font-serif hover:text-genius-light transition-colors font-medium">Company Profile  </a>
               <button
                 type="button"
-                style={{color: "#3A2B20", background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer'}}
+                style={{color: "#F5F5DC", background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer'}}
                 className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium"
                 onClick={() => setShowExpertiseModal(true)}
               >
                 Our Work
               </button>
-              <a href="#portfolio" style={{color: "#3A2B20"}} className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium">Portfolio</a>
-              <a href="#contact" style={{color: "#3A2B20"}} className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium">Contact</a>
+              <a href="#portfolio" style={{color: "#F5F5DC"}} className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium">Portfolio</a>
+              <a href="#contact" style={{color: "#F5F5DC"}} className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium">Contact</a>
             </div>
             {/* Mobile Burger Icon */}
             <button
@@ -200,7 +224,8 @@ export default function Home() {
             onLoadedData={() => console.log('Video loaded successfully:', videoSources[currentVideoIndex])}
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
             style={{ 
-              filter: 'brightness(0.4) contrast(1.2)',
+              filter: 'brightness(0.7) contrast(1.1)',
+              transform: 'scale(1.1)',
               zIndex: 5
             }}
           >
@@ -209,15 +234,17 @@ export default function Home() {
           </video>
           
           {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/30 z-10"></div>
+          <div className="absolute inset-0 bg-black/15 z-10"></div>
+          
+          {/* Bottom gradient blend overlay */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-genius-light via-genius-light/80 to-transparent z-20"></div>
         </div>
         
         {/* Hero Content */}
         <div className="relative z-10 text-center px-6 max-w-6xl mx-auto video-hero-content">
           <div className="mb-8">
             <h1 className="text-6xl md:text-8xl font-serif font-light text-genius-light mb-8 leading-tight drop-shadow-2xl video-hero-title text-glow">
-              Crafting
-              <span className="block text-genius-cream font-medium">Excellence</span>
+              <span className="text-genius-light">Crafting</span> <span className="text-genius-cream font-medium">Excellence</span>
             </h1>
             <p className="text-2xl md:text-3xl text-genius-cream max-w-4xl mx-auto leading-relaxed mb-12 drop-shadow-lg video-hero-subtitle">
               Where every detail tells a story of luxury, innovation, and timeless elegance
@@ -225,13 +252,13 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center video-hero-buttons">
             <button
-              className="bg-genius-light/20 backdrop-blur-xl text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/30 hover:text-genius-cream luxury-hover shadow-2xl border border-genius-cream/30 text-lg"
+              className="bg-genius-light/20 backdrop-blur-2xl text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/30 hover:text-genius-cream luxury-hover shadow-2xl border border-genius-cream/30 text-lg"
               onClick={() => setShowExpertiseModal(true)}
             >
               Discover Our Craft
             </button>
             <button
-              className="border-2 border-genius-light/60 text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/20 hover:text-genius-cream luxury-hover shadow-2xl bg-black/20 backdrop-blur-xl text-lg"
+              className="border-2 border-genius-light/60 text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/20 hover:text-genius-cream luxury-hover shadow-2xl bg-black/20 backdrop-blur-2xl text-lg"
               onClick={handleScrollToContact}
             >
               Start Your Journey
@@ -290,104 +317,66 @@ export default function Home() {
             </button>
           </div>
         </div>
-        {/* Expertise Drawer Toggle Button */}
-        <button
-          className="relative z-[60] -mt-6 mb-2 flex items-center justify-center w-14 h-14 min-w-[44px] min-h-[44px] rounded-full border border-genius-tan/40 shadow-xl hover:bg-genius-brown/80 transition-colors"
-          style={{
-            background: `url('/leather.jpg') center center / cover no-repeat, rgba(255,255,255,0.82)`,
-            backgroundBlendMode: 'multiply',
-          }}
-          onClick={() => setShowExpertiseDrawer(v => !v)}
-          aria-label={showExpertiseDrawer ? 'Hide expertise shortcuts' : 'Show expertise shortcuts'}
-          type="button"
-        >
-          {showExpertiseDrawer ? <ChevronDown size={28} className="text-genius-brown" /> : <ChevronUp size={28} className="text-genius-brown" />}
-        </button>
-        {/* Expertise Drawer */}
-        <div
-          className={`absolute left-1/2 top-full md:fixed md:top-[calc(40vh+260px)] -mt-35 md:mt-0 transform -translate-x-1/2 transition-all duration-500 ease-in-out w-full max-w-full md:w-[98vw] md:max-w-5xl z-30 px-2 ${showExpertiseDrawer ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-8 pointer-events-none'}`}
-        >
-          <div
-            className="velvet-bg bg-genius-light/90 border border-genius-tan/40 shadow-2xl rounded-2xl px-2 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2 luxury-hover backdrop-blur-xl"
-          >
-            <div className="flex-1 flex flex-row flex-wrap md:flex-nowrap gap-3 md:gap-4 px-1 md:px-2 items-center justify-center overflow-x-auto md:overflow-x-auto scrollbar-hide">
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                return (
-                  <div key={cat.name} className="flex flex-col items-center justify-center min-w-[56px] md:min-w-[40px]">
-                    <span className="text-genius-brown drop-shadow mb-1">
-                      <span className="block md:hidden"><Icon size={36} strokeWidth={1.5} /></span>
-                      <span className="hidden md:block"><Icon size={24} strokeWidth={1.5} /></span>
-                    </span>
-                    <span className="text-[11px] md:text-[10px] font-serif text-genius-brown/80 whitespace-nowrap text-center leading-tight">{cat.name}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-        {/* Spacer for drawer overlap */}
-        <div style={{height: showExpertiseDrawer ? '80px' : '0', transition: 'height 0.5s'}} />
       </section>
 
       {/* About Section */}
       <section id="about" className="py-20 px-6 flex justify-center items-center fade-in-up">
-        <div className="max-w-5xl w-full mx-auto rounded-3xl velvet-bg backdrop-blur-xl border border-genius-cream/40 shadow-xl p-12">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-serif font-medium text-genius-brown mb-6 drop-shadow-md">
-                A Legacy of Excellence
-              </h2>
-              <p className="text-lg text-genius-brown mb-6 leading-relaxed">
-                For over two decades, GeniusTouch has been the trusted partner of luxury brands worldwide, 
-                creating packaging that speaks volumes about quality, sophistication, and attention to detail.
-              </p>
-              <p className="text-lg text-genius-brown leading-relaxed">
-                Our commitment to craftsmanship, premium materials, and innovative design ensures that 
-                every piece we create becomes an integral part of your brand&apos;s story.
-              </p>
-            </div>
-            <div className="relative flex justify-center items-center">
-              <div className="aspect-square w-56 bg-genius-cream/60 border border-genius-tan/40 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-xl">
-                <span className="text-6xl text-genius-brown">✨</span>
-              </div>
-            </div>
+        <div className="max-w-4xl w-full mx-auto rounded-3xl velvet-bg backdrop-blur-xl border border-genius-cream/40 shadow-xl p-12">
+          <div className="text-center">
+            <h2 className="text-4xl font-serif font-medium text-genius-brown mb-6 drop-shadow-md">
+              A Legacy of Excellence
+            </h2>
+            <p className="text-lg text-genius-brown leading-relaxed">
+              Founded in 2013, GeniusTouch began as a small operation that grew through dedication to quality and reputation. Our CEO personally carried samples door-to-door, building relationships that became the foundation of our success. Today, we continue investing in cutting-edge equipment while expanding our vision to become the premier destination for celebrities and discerning individuals seeking luxurious packaging. With plans for international expansion and diversification into leather decoration and women's handbags, we're building a legacy that transcends borders.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Expertise Modal */}
+      {/* Expertise Popup Modal */}
       {showExpertiseModal && (
-        <div className="fixed inset-0 z-50 velvet-bg flex items-center justify-center bg-black/80 backdrop-blur-2xl" onClick={() => setShowExpertiseModal(false)}>
+        <div className="absolute inset-0 z-[999999] flex items-center justify-center p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}>
+          {/* Dark backdrop overlay */}
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999990 }}
+            onClick={() => setShowExpertiseModal(false)}
+          ></div>
+          
+          {/* Modal content */}
           <div
-            className="bg-genius-light rounded-3xl shadow-2xl p-10 max-w-3xl w-full relative border border-genius-cream/40 fade-in-up transition-all duration-300 overflow-y-auto max-h-[90vh] scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="relative bg-genius-brown rounded-3xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+            style={{ position: 'relative', zIndex: 999995 }}
             onClick={e => e.stopPropagation()}
           >
-            <button
-              className="absolute top-4 right-4 text-genius-brown hover:text-genius-dark"
-              onClick={() => setShowExpertiseModal(false)}
-              aria-label="Close"
-            >
-              <X size={28} />
-            </button>
-            <div className="text-center mb-10">
-              <h2 className="text-4xl font-serif font-medium text-genius-brown mb-4 drop-shadow-md">
-                Our Expertise
-              </h2>
-              <p className="text-xl text-genius-brown max-w-2xl mx-auto">
-                Specialized packaging solutions across luxury industries
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6 items-start">
-              {categories.map((category, index) => (
-                <div
-                  key={index}
-                  className={`group luxury-hover bg-genius-light/60 backdrop-blur-xl border border-genius-cream/40 p-6 rounded-2xl shadow-lg hover:border-genius-tan cursor-pointer transition-transform duration-300 self-start${mounted ? ' fade-in-up' : ''}`}
-                  style={mounted ? { animationDelay: `${index * 60}ms` } : {}}
+            {/* Header */}
+            <div className="sticky top-0 bg-genius-brown/95 backdrop-blur-xl p-6 border-b border-genius-light/20 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-serif font-semibold text-genius-light mb-2">
+                    Our Expertise
+                  </h2>
+                  <p className="text-genius-cream/90">
+                    Specialized packaging solutions across luxury industries
+                  </p>
+                </div>
+                <button
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-genius-light/20 hover:bg-genius-light/30 text-genius-light hover:text-genius-cream transition-colors"
+                  onClick={() => setShowExpertiseModal(false)}
+                  aria-label="Close modal"
                 >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            
+            {/* Scrollable content */}
+            <div className="overflow-y-auto max-h-[calc(85vh-120px)] p-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categories.map((category, index) => (
                   <div
-                    className="flex items-center justify-between"
+                    key={index}
+                    className="group bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-5 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-lg transition-all duration-300 cursor-pointer"
                     onClick={() => {
                       setExpandedCategories(prev => {
                         const newSet = new Set(prev);
@@ -400,31 +389,49 @@ export default function Home() {
                       });
                     }}
                   >
-                    <div className="flex items-center space-x-4">
-                      <span className="text-3xl text-genius-brown drop-shadow">
-                        <category.icon size={32} strokeWidth={1.5} />
-                      </span>
-                      <span className="text-lg font-serif font-medium text-genius-dark">{category.name}</span>
+                    {/* Category header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-genius-light/20 shadow-sm">
+                          <category.icon size={24} strokeWidth={1.5} color="#F5F5DC" />
+                        </div>
+                        <div>
+                          <h3 className="font-serif font-medium text-genius-light text-lg">
+                            {category.name}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="text-genius-cream/60 group-hover:text-genius-cream transition-colors">
+                        {expandedCategories.has(index) ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      </div>
                     </div>
-                    <button
-                      className="ml-2 text-genius-brown hover:text-genius-dark focus:outline-none"
-                      aria-label={expandedCategories.has(index) ? 'Collapse' : 'Expand'}
-                    >
-                      {expandedCategories.has(index) ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
-                    </button>
+                    
+                    {/* Category description */}
+                    <p className="text-sm text-genius-cream/80 mb-3">
+                      {category.description}
+                    </p>
+                    
+                    {/* Expanded client list */}
+                    {expandedCategories.has(index) && (
+                      <div className="mt-4 pt-4 border-t border-genius-light/20 animate-in slide-in-from-top-2 duration-200">
+                        <h4 className="text-sm font-semibold text-genius-light mb-2">
+                          Notable Clients:
+                        </h4>
+                        <ul className="space-y-1">
+                          {category.clients.map((client, idx) => (
+                            <li key={idx} className="text-sm text-genius-cream/70 flex items-center">
+                              <div className="w-1.5 h-1.5 rounded-full bg-genius-cream mr-2"></div>
+                              {client}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-genius-brown text-sm mt-2 mb-1">{category.description}</div>
-                  {expandedCategories.has(index) && (
-                    <ul className="mt-4 space-y-2 bg-genius-cream/40 rounded-lg p-4 border border-genius-tan/30">
-                      <li className="text-genius-dark font-semibold mb-2">Clients:</li>
-                      {category.clients.map((client, idx) => (
-                        <li key={idx} className="text-genius-dark pl-2">{client}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            
           </div>
         </div>
       )}
