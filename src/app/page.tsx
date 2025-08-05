@@ -1,7 +1,7 @@
 "use client";
 // TODO : ADD BACGROUND TO HERO SECTION, MAKE THE CATEGORIES OF THE BUSINESS IN THE MAIN PAGE AS WELLL
-import { Wine, FlaskConical, Flower2, Utensils, Hotel, GraduationCap, BookOpen, Candy, Watch, Gift, ArrowLeft, MessageCircle, X, ChevronDown, ChevronUp, Menu } from 'lucide-react';
-import React, { useState, useEffect, FC } from 'react';
+import { Wine, FlaskConical, Flower2, Utensils, Hotel, GraduationCap, BookOpen, Candy, Watch, Gift, ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // Add CigarIcon SVG component
 const CigarIcon = ({ size = 36, color = '#7E6A52' }) => (
@@ -24,32 +24,20 @@ export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [showExpertiseModal, setShowExpertiseModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
-  // Array of video sources
-  const videoSources = [
+  // Array of video sources - memoized to prevent re-creation on every render
+  const videoSources = useMemo(() => [
     '/luxury-packaging-video-1.mp4.mp4',
     '/luxury-packaging-video-2.mp4.mp4',
     '/luxury-packaging-video-3.mp4.mp4',
     // Add more videos as needed
-  ];
+  ], []);
   
   useEffect(() => { 
-    setMounted(true); 
-    
     // Log video sources for debugging
     console.log('Video sources:', videoSources);
-    
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setScrollY(scrollPosition);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [videoSources]);
 
   // Disable body scroll when modal is open
