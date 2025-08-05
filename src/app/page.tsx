@@ -274,7 +274,7 @@ export default function Home() {
               A Legacy of Excellence
             </h2>
             <p className="text-lg text-genius-brown leading-relaxed">
-              Founded in 2013, GeniusTouch began as a small operation that grew through dedication to quality and reputation. Our CEO personally carried samples door-to-door, building relationships that became the foundation of our success. Today, we continue investing in cutting-edge equipment while expanding our vision to become the premier destination for celebrities and discerning individuals seeking luxurious packaging. With plans for international expansion and diversification into leather decoration and women's handbags, we're building a legacy that transcends borders.
+              Founded in 2013, GeniusTouch began as a small operation that grew through dedication to quality and reputation. Our CEO personally carried samples door-to-door, building relationships that became the foundation of our success. Today, we continue investing in cutting-edge equipment while expanding our vision to become the premier destination for celebrities and discerning individuals seeking luxurious packaging. With plans for international expansion and diversification into leather decoration and women&apos;s handbags, we&apos;re building a legacy that transcends borders.
             </p>
           </div>
         </div>
