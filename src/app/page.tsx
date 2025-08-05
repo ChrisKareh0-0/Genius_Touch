@@ -23,12 +23,10 @@ type Category = {
 export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [showExpertiseModal, setShowExpertiseModal] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const [leatherBoxVisible, setLeatherBoxVisible] = useState(false);
-  const [cornerImageVisible, setCornerImageVisible] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
   // Array of video sources
@@ -48,25 +46,25 @@ export default function Home() {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setScrollY(scrollPosition);
-      
-      // Show leather box when scrolled past 200px for earlier appearance
-      if (scrollPosition > 200) {
-        setLeatherBoxVisible(true);
-      } else {
-        setLeatherBoxVisible(false);
-      }
-      
-      // Show corner image when scrolled past 300px
-      if (scrollPosition > 300) {
-        setCornerImageVisible(true);
-      } else {
-        setCornerImageVisible(false);
-      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [videoSources]);
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (showExpertiseModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showExpertiseModal]);
   const categories: Category[] = [
     { name: 'Cigars', icon: (props) => <CigarIcon {...props} />, image: '/demo/cigars.jpg', description: 'Premium cigar packaging solutions', clients: ['Cigar Co. A', 'Cigar Brand B', 'Luxury Cigars Ltd.'] },
     { name: 'Alcohol & Drinks', icon: (props) => <Wine {...props} />, image: '/demo/alcohol.jpg', description: 'Luxury beverage packaging', clients: ['Fine Spirits Inc.', 'Wine Masters', 'Elite Distillers'] },
@@ -96,47 +94,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-genius-light font-sans">
-      {/* Leather Box Design Image */}
-      <div className={`leather-box-container left ${leatherBoxVisible ? 'visible' : ''}`}>
-        <img 
-          src="/leather box design.png" 
-          alt="Leather Box Design" 
-          className="leather-box-image"
-          style={{
-            transform: `translateX(${leatherBoxVisible ? 0 : -100}%)`,
-            opacity: leatherBoxVisible ? 1 : 0,
-            transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        />
-      </div>
-      
-      {/* Corner Photo */}
-      <div className="fixed top-0 right-0 z-40 pointer-events-none cornerImage" style={{ transform: 'translateX(80px)' }}>
-        <img 
-          src="/corner photo.png" 
-          alt="Corner Photo" 
-          className="h-152 w-auto shadow-lg"
-          style={{
-            transform: `translateX(${cornerImageVisible ? 0 : 100}%)`,
-            opacity: cornerImageVisible ? 1 : 0,
-            transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-            border: 'none',
-            outline: 'none',
-            background: 'transparent',
-          }}
-        />
-      </div>
+
       
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-genius-brown/80 backdrop-blur-xl z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/GT LOGO.png" 
-                alt="GeniusTouch Logo" 
-                className="h-10 w-auto shadow-md"
-              />
               <span style={{color: "#F5F5DC"}} className="text-genius-light font-serif text-xl font-semibold">GeniusTouch</span>
             </div>
             {/* Desktop Nav */}
@@ -181,11 +145,6 @@ export default function Home() {
                 <X size={32} />
               </button>
               <div className="flex items-center space-x-3 mb-4">
-                <img 
-                  src="/GT LOGO.png" 
-                  alt="GeniusTouch Logo" 
-                  className="h-8 w-auto shadow-md"
-                />
                 <span className="text-genius-dark font-serif text-lg font-semibold">GeniusTouch</span>
               </div>
               <a href="#about" className="text-genius-dark font-serif text-lg font-medium hover:text-genius-brown transition-colors text-center" onClick={() => setShowMobileNav(false)}>Company Profile</a>
@@ -345,7 +304,7 @@ export default function Home() {
           
           {/* Modal content */}
           <div
-            className="relative bg-genius-brown rounded-3xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+            className="relative bg-genius-brown rounded-3xl shadow-2xl max-w-5xl w-full max-h-[85vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-300"
             style={{ position: 'relative', zIndex: 999995 }}
             onClick={e => e.stopPropagation()}
           >
@@ -371,65 +330,107 @@ export default function Home() {
             </div>
             
             {/* Scrollable content */}
-            <div className="overflow-y-auto max-h-[calc(85vh-120px)] p-6">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="group bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-5 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                    onClick={() => {
-                      setExpandedCategories(prev => {
-                        const newSet = new Set(prev);
-                        if (newSet.has(index)) {
-                          newSet.delete(index);
-                        } else {
-                          newSet.add(index);
-                        }
-                        return newSet;
-                      });
-                    }}
-                  >
-                    {/* Category header */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-genius-light/20 shadow-sm">
-                          <category.icon size={24} strokeWidth={1.5} color="#F5F5DC" />
+            <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'thin', scrollbarColor: '#B89C82 #F9F5ED' }}>
+              {selectedCategory === null ? (
+                // Category selection view
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categories.map((category, index) => (
+                    <div
+                      key={index}
+                      className="group bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-6 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+                      onClick={() => setSelectedCategory(index)}
+                    >
+                      {/* Category header */}
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-genius-light/20 shadow-lg">
+                          <category.icon size={32} strokeWidth={1.5} color="#F5F5DC" />
                         </div>
                         <div>
-                          <h3 className="font-serif font-medium text-genius-light text-lg">
+                          <h3 className="font-serif font-medium text-genius-light text-xl">
                             {category.name}
                           </h3>
+                          <p className="text-sm text-genius-cream/80 mt-1">
+                            {category.description}
+                          </p>
                         </div>
                       </div>
-                      <div className="text-genius-cream/60 group-hover:text-genius-cream transition-colors">
-                        {expandedCategories.has(index) ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      
+                      {/* Preview images */}
+                      <div className="grid grid-cols-3 gap-2 mb-4">
+                        {[1, 2, 3].map((imgIndex) => (
+                          <div key={imgIndex} className="aspect-square bg-genius-light/20 rounded-lg overflow-hidden">
+                            <img 
+                              src={`/${Math.min(imgIndex + (index * 3), 12)}.jpg`} 
+                              alt={`${category.name} preview ${imgIndex}`}
+                              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* View gallery button */}
+                      <div className="text-center">
+                        <span className="text-genius-cream/80 text-sm font-medium group-hover:text-genius-cream transition-colors">
+                          View Gallery →
+                        </span>
                       </div>
                     </div>
-                    
-                    {/* Category description */}
-                    <p className="text-sm text-genius-cream/80 mb-3">
-                      {category.description}
-                    </p>
-                    
-                    {/* Expanded client list */}
-                    {expandedCategories.has(index) && (
-                      <div className="mt-4 pt-4 border-t border-genius-light/20 animate-in slide-in-from-top-2 duration-200">
-                        <h4 className="text-sm font-semibold text-genius-light mb-2">
-                          Notable Clients:
-                        </h4>
-                        <ul className="space-y-1">
-                          {category.clients.map((client, idx) => (
-                            <li key={idx} className="text-sm text-genius-cream/70 flex items-center">
-                              <div className="w-1.5 h-1.5 rounded-full bg-genius-cream mr-2"></div>
-                              {client}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                  ))}
+                </div>
+              ) : (
+                // Gallery view for selected category
+                <div className="space-y-6">
+                  {/* Back button and category header */}
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className="flex items-center text-genius-cream/80 hover:text-genius-cream transition-colors"
+                    >
+                      <ArrowLeft size={20} className="mr-2" />
+                      Back to Categories
+                    </button>
+                    <div className="text-center">
+                      <h3 className="font-serif font-medium text-genius-light text-2xl">
+                        {categories[selectedCategory].name}
+                      </h3>
+                      <p className="text-genius-cream/80 mt-1">
+                        {categories[selectedCategory].description}
+                      </p>
+                    </div>
+                    <div className="w-20"></div> {/* Spacer for centering */}
                   </div>
-                ))}
-              </div>
+                  
+                                     {/* Gallery grid */}
+                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((imgIndex) => (
+                       <div key={imgIndex} className="group">
+                         <div className="aspect-[4/5] bg-genius-light/20 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 relative">
+                           <img 
+                             src={`/${Math.min(imgIndex + (selectedCategory * 3), 12)}.jpg`} 
+                             alt={`${categories[selectedCategory].name} gallery ${imgIndex}`}
+                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                  
+                  {/* Notable clients section */}
+                  <div className="mt-8 p-6 bg-genius-light/10 rounded-2xl border border-genius-light/20">
+                    <h4 className="text-lg font-semibold text-genius-light mb-4 text-center">
+                      Notable Clients
+                    </h4>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {categories[selectedCategory].clients.map((client, idx) => (
+                        <div key={idx} className="text-center p-3 bg-genius-light/5 rounded-xl border border-genius-light/10">
+                          <span className="text-genius-cream/90 font-medium">{client}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
           </div>
@@ -438,7 +439,7 @@ export default function Home() {
 
       {/* Portfolio Preview */}
       <section id="portfolio" className="py-20 px-6 flex justify-center items-center fade-in-up">
-        <div className="max-w-6xl w-full mx-auto velvet-bg rounded-3xl bg-genius-light/40 backdrop-blur-xl border border-genius-cream/40 shadow-2xl p-12">
+        <div className="max-w-7xl w-full mx-auto velvet-bg rounded-3xl bg-genius-light/40 backdrop-blur-xl border border-genius-cream/40 shadow-2xl p-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-serif font-medium mb-6 text-genius-brown drop-shadow-md">
               Signature Collections
@@ -447,16 +448,18 @@ export default function Home() {
               Discover our most celebrated packaging designs
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg p-6">
-                <div className="aspect-[4/5] bg-genius-light/60 border border-genius-cream/40 mb-4 flex items-center justify-center rounded-xl shadow-md">
-                  <span className="text-4xl opacity-80 text-genius-brown">📦</span>
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item) => (
+              <div key={item} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
+                <div className="aspect-[4/5] relative overflow-hidden">
+                  <img 
+                    src={`/${item}.jpg`} 
+                    alt={`Luxury Packaging Collection ${item}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <h3 className="text-lg font-serif font-medium mb-2 text-genius-dark">Collection {item}</h3>
-                <p className="text-genius-brown/80 text-sm">
-                  Luxury packaging showcase
-                </p>
+
               </div>
             ))}
           </div>
@@ -571,7 +574,13 @@ export default function Home() {
         href="https://wa.me/1234567890" // Replace with your WhatsApp number
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-genius-brown hover:bg-genius-dark transition-colors rounded-full shadow-2xl flex items-center justify-center w-16 h-16 float-animate"
+        className="fixed bottom-6 right-6 z-[9999] bg-genius-dark hover:bg-genius-brown transition-colors rounded-full shadow-2xl flex items-center justify-center w-16 h-16 float-animate"
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999
+        }}
         aria-label="Chat on WhatsApp"
       >
         <MessageCircle size={36} className="text-genius-cream" />
