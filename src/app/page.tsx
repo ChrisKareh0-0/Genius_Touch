@@ -24,6 +24,7 @@ export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [showExpertiseModal, setShowExpertiseModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [showClientsTab, setShowClientsTab] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   
@@ -67,6 +68,36 @@ export default function Home() {
     { name: 'Promotional Items', icon: (props) => <Gift {...props} />, image: '/demo/promo.jpg', description: 'Custom promotional packaging', clients: ['PromoGenius', 'Brand Boosters', 'Elite Promotions'] },
   ];
 
+  const featuredClients = [
+    'LADERACH',
+    'BOLD',
+    'CHRIS HARRIS',
+    'FATEN',
+    'SAKINA',
+    'BARRAQ',
+    'MERCEDES BENZ',
+    'UNIFAB',
+    'GANACHE',
+    'KHAN AL SABOUN',
+    'HANDY',
+    'WOROOD',
+    'BONDS',
+    'LA ROSE',
+    'QINWAN',
+    'FIDEL',
+    'ESA BUSINESS SCHOOL',
+    'RIBBON',
+    'MANOLIA',
+    'NDU',
+    'LA PRALINE',
+    'AUST',
+    'SERAF',
+    "MOULIN D'OR",
+    'DORE',
+    'GLOBAL UNIVERSITY',
+    'RCHIDEE'
+  ];
+
   const handleScrollToContact = () => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
@@ -78,6 +109,12 @@ export default function Home() {
     setCurrentVideoIndex((prevIndex) => 
       (prevIndex + 1) % videoSources.length
     );
+  };
+
+  const handleOpenExpertiseModal = () => {
+    setShowExpertiseModal(true);
+    setSelectedCategory(null);
+    setShowClientsTab(true);
   };
 
   return (
@@ -98,7 +135,7 @@ export default function Home() {
                 type="button"
                 style={{color: "#F5F5DC", background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer'}}
                 className="text-genius-cream hover:text-genius-light font-serif transition-colors font-medium"
-                onClick={() => setShowExpertiseModal(true)}
+                onClick={handleOpenExpertiseModal}
               >
                 Our Work
               </button>
@@ -140,7 +177,7 @@ export default function Home() {
                 type="button"
                 className="text-genius-dark font-serif text-lg font-medium hover:text-genius-brown transition-colors text-center"
                 style={{background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer'}}
-                onClick={() => { setShowExpertiseModal(true); setShowMobileNav(false); }}
+                onClick={() => { handleOpenExpertiseModal(); setShowMobileNav(false); }}
               >
                 Our Work
               </button>
@@ -200,7 +237,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center video-hero-buttons">
             <button
               className="bg-genius-light/20 backdrop-blur-2xl text-genius-light px-10 py-5 rounded-2xl font-medium tracking-wide hover:bg-genius-light/30 hover:text-genius-cream luxury-hover shadow-2xl border border-genius-cream/30 text-lg"
-              onClick={() => setShowExpertiseModal(true)}
+              onClick={handleOpenExpertiseModal}
             >
               Discover Our Craft
             </button>
@@ -252,7 +289,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
             <button
               className="bg-genius-dark/80 text-genius-light px-8 py-4 rounded-xl font-medium tracking-wide hover:bg-genius-brown/90 hover:text-genius-cream luxury-hover shadow-md border border-genius-brown/40"
-              onClick={() => setShowExpertiseModal(true)}
+              onClick={handleOpenExpertiseModal}
             >
               Explore Our Portfolio
             </button>
@@ -301,11 +338,35 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-3xl font-serif font-semibold text-genius-light mb-2">
-                    Our Expertise
+                    Featured Clients & Portfolio
                   </h2>
                   <p className="text-genius-cream/90">
-                    Specialized packaging solutions across luxury industries
+                    Discover our prestigious clientele and signature work
                   </p>
+                  
+                  {/* Tab Navigation */}
+                  <div className="flex space-x-1 mt-4">
+                    <button
+                      onClick={() => { setShowClientsTab(true); }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        showClientsTab
+                          ? 'bg-genius-light/30 text-genius-light'
+                          : 'text-genius-cream/70 hover:text-genius-cream hover:bg-genius-light/10'
+                      }`}
+                    >
+                      Featured Clients
+                    </button>
+                    <button
+                      onClick={() => { setShowClientsTab(false); }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        !showClientsTab
+                          ? 'bg-genius-light/30 text-genius-light'
+                          : 'text-genius-cream/70 hover:text-genius-cream hover:bg-genius-light/10'
+                      }`}
+                    >
+                      Portfolio Gallery
+                    </button>
+                  </div>
                 </div>
                 <button
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-genius-light/20 hover:bg-genius-light/30 text-genius-light hover:text-genius-cream transition-colors"
@@ -319,106 +380,84 @@ export default function Home() {
             
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'thin', scrollbarColor: '#B89C82 #F9F5ED' }}>
-              {selectedCategory === null ? (
-                // Category selection view
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {categories.map((category, index) => (
-                    <div
-                      key={index}
-                      className="group bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-6 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
-                      onClick={() => setSelectedCategory(index)}
-                    >
-                      {/* Category header */}
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-genius-light/20 shadow-lg">
-                          <category.icon size={32} strokeWidth={1.5} color="#F5F5DC" />
-                        </div>
-                        <div>
-                          <h3 className="font-serif font-medium text-genius-light text-xl">
-                            {category.name}
-                          </h3>
-                          <p className="text-sm text-genius-cream/80 mt-1">
-                            {category.description}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {/* Preview images */}
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        {[1, 2, 3].map((imgIndex) => (
-                          <div key={imgIndex} className="aspect-square bg-genius-light/20 rounded-lg overflow-hidden">
-                            <img 
-                              src={`/${Math.min(imgIndex + (index * 3), 12)}.jpg`} 
-                              alt={`${category.name} preview ${imgIndex}`}
-                              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* View gallery button */}
-                      <div className="text-center">
-                        <span className="text-genius-cream/80 text-sm font-medium group-hover:text-genius-cream transition-colors">
-                          View Gallery →
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                // Gallery view for selected category
+              {showClientsTab ? (
+                // Featured Clients view
                 <div className="space-y-6">
-                  {/* Back button and category header */}
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => setSelectedCategory(null)}
-                      className="flex items-center text-genius-cream/80 hover:text-genius-cream transition-colors"
-                    >
-                      <ArrowLeft size={20} className="mr-2" />
-                      Back to Categories
-                    </button>
-                    <div className="text-center">
-                      <h3 className="font-serif font-medium text-genius-light text-2xl">
-                        {categories[selectedCategory].name}
-                      </h3>
-                      <p className="text-genius-cream/80 mt-1">
-                        {categories[selectedCategory].description}
-                      </p>
-                    </div>
-                    <div className="w-20"></div> {/* Spacer for centering */}
+                  <div className="text-center mb-8">
+                    <h3 className="text-3xl font-serif font-medium text-genius-light mb-4">
+                      Featured Clients
+                    </h3>
                   </div>
                   
-                                     {/* Gallery grid */}
-                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
-                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((imgIndex) => (
-                       <div key={imgIndex} className="group">
-                         <div className="aspect-[4/5] bg-genius-light/20 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 relative">
-                           <img 
-                             src={`/${Math.min(imgIndex + (selectedCategory * 3), 12)}.jpg`} 
-                             alt={`${categories[selectedCategory].name} gallery ${imgIndex}`}
-                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                           />
-                           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                         </div>
-                       </div>
-                     ))}
-                   </div>
-                  
-                  {/* Notable clients section */}
-                  <div className="mt-8 p-6 bg-genius-light/10 rounded-2xl border border-genius-light/20">
-                    <h4 className="text-lg font-semibold text-genius-light mb-4 text-center">
-                      Notable Clients
-                    </h4>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      {categories[selectedCategory].clients.map((client, idx) => (
-                        <div key={idx} className="text-center p-3 bg-genius-light/5 rounded-xl border border-genius-light/10">
-                          <span className="text-genius-cream/90 font-medium">{client}</span>
+                  <div className="grid md:grid-cols-3 gap-8 mb-8">
+                    {featuredClients.map((client: string, index: number) => (
+                      <div key={index} className="group">
+                        <div className="bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-8 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                          <div className="text-center">
+                            <h4 className="text-xl font-serif font-semibold text-genius-light">
+                              {client}
+                            </h4>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                // Portfolio Gallery view
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h3 className="text-3xl font-serif font-medium text-genius-light mb-4">
+                      Portfolio Gallery
+                    </h3>
+                    <p className="text-genius-cream/80 text-lg">
+                      Explore our comprehensive collection of luxury packaging designs
+                    </p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {[
+                      '/footages/170.jpg', '/footages/152.jpg', '/footages/201.jpg', '/footages/194.jpg',
+                      '/footages/139.jpg', '/footages/190.jpg', '/footages/191.jpg', '/footages/215.jpg',
+                      '/footages/180.jpg', '/footages/119.jpg', '/footages/149.jpg', '/footages/156.jpg',
+                      '/footages/178.jpg', '/footages/179.jpg', '/footages/167.jpg', '/footages/143.jpg',
+                      '/footages/158.jpg', '/footages/189.jpg', '/footages/209.jpg', '/footages/199.jpg',
+                      '/footages/137.jpg', '/footages/196.jpg', '/footages/214.jpg', '/footages/203.jpg',
+                      '/footages/186.jpg', '/footages/198.jpg', '/footages/187.jpg', '/footages/219.jpg',
+                      '/footages/142.jpg', '/footages/161.jpg', '/footages/172.jpg', '/footages/211.jpg',
+                      '/footages/165.jpg', '/footages/177.jpg', '/footages/141.jpg', '/footages/220.jpg',
+                      '/footages/122.jpg', '/footages/140.jpg', '/footages/151.jpg', '/footages/147.jpg',
+                      '/footages/129.jpg', '/footages/206.jpg', '/footages/133.jpg', '/footages/176.jpg',
+                      '/footages/128.jpg', '/footages/208.jpg', '/footages/193.jpg', '/footages/126.jpg',
+                      '/footages/210.jpg', '/footages/212.jpg', '/footages/218.jpg', '/footages/154.jpg',
+                      '/footages/205.jpg', '/footages/120.jpg', '/footages/123.jpg', '/footages/168.jpg',
+                      '/footages/188.jpg', '/footages/131.jpg', '/footages/118.jpg', '/footages/134.jpg',
+                      '/footages/135.jpg', '/footages/166.jpg', '/footages/138.jpg', '/footages/150.jpg',
+                      '/footages/116.jpg', '/footages/200.jpg', '/footages/130.jpg', '/footages/163.jpg',
+                      '/footages/121.jpg', '/footages/192.jpg', '/footages/171.jpg', '/footages/159.jpg',
+                      '/footages/153.jpg', '/footages/117.jpg', '/footages/195.jpg', '/footages/217.jpg',
+                      '/footages/160.jpg', '/footages/144.jpg', '/footages/174.jpg', '/footages/136.jpg',
+                      '/footages/213.jpg', '/footages/125.jpg', '/footages/146.jpg', '/footages/124.jpg',
+                      '/footages/197.jpg', '/footages/164.jpg', '/footages/175.jpg', '/footages/145.jpg',
+                      '/footages/173.jpg', '/footages/221.jpg', '/footages/169.jpg', '/footages/162.jpg',
+                      '/footages/185.jpg', '/footages/157.jpg', '/footages/127.jpg', '/footages/207.jpg',
+                      '/footages/216.jpg', '/footages/155.jpg', '/footages/148.jpg', '/footages/132.jpg'
+                    ].map((imagePath, index) => (
+                      <div key={index} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
+                        <div className="aspect-[4/5] relative overflow-hidden">
+                          <img 
+                            src={imagePath} 
+                            alt={`Luxury Packaging Collection ${index + 1}`}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
+
             </div>
             
           </div>
@@ -495,7 +534,7 @@ export default function Home() {
                   Schedule a Consultation
                 </button> */}
                 <a
-                  href="https://wa.me/1234567890" // Replace with your WhatsApp number
+                  href="https://wa.me/9613721171" // Replace with your WhatsApp number
                   target="_blank"
                   rel="noopener noreferrer"
                   className="border-2 border-genius-dark/60 text-genius-dark px-8 py-4 rounded-xl font-medium tracking-wide hover:bg-genius-dark/80 hover:text-genius-light luxury-hover shadow-md bg-genius-cream/60 backdrop-blur-xl flex items-center justify-center"
@@ -547,7 +586,7 @@ export default function Home() {
               <h4 className="font-serif font-medium mb-4 text-genius-cream">Contact</h4>
               <ul className="space-y-2 text-sm text-genius-cream/80">
                 <li>info@geniustouch.com</li>
-                <li>+1 (555) 123-4567</li>
+                <li>+9613721171</li>
                 <li>By appointment only</li>
               </ul>
             </div>
@@ -559,7 +598,7 @@ export default function Home() {
       </footer>
       {/* Floating WhatsApp Button */}
       <a
-        href="https://wa.me/1234567890" // Replace with your WhatsApp number
+        href="https://wa.me/9613721171" // Replace with your WhatsApp number
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-[9999] bg-genius-dark hover:bg-genius-brown transition-colors rounded-full shadow-2xl flex items-center justify-center w-16 h-16 float-animate"
