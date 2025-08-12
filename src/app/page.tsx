@@ -1,6 +1,6 @@
 "use client";
 // TODO : ADD BACGROUND TO HERO SECTION, MAKE THE CATEGORIES OF THE BUSINESS IN THE MAIN PAGE AS WELLL
-import { Wine, FlaskConical, Flower2, Utensils, Hotel, GraduationCap, BookOpen, Candy, Watch, Gift, ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
+import { ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 
 // Add CigarIcon SVG component
@@ -23,7 +23,6 @@ type Category = {
 export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [showExpertiseModal, setShowExpertiseModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [showClientsTab, setShowClientsTab] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -54,19 +53,17 @@ export default function Home() {
       document.body.style.overflow = 'unset';
     };
   }, [showExpertiseModal]);
-  const categories: Category[] = [
-    { name: 'Cigars', icon: (props) => <CigarIcon {...props} />, image: '/demo/cigars.jpg', description: 'Premium cigar packaging solutions', clients: ['Cigar Co. A', 'Cigar Brand B', 'Luxury Cigars Ltd.'] },
-    { name: 'Alcohol & Drinks', icon: (props) => <Wine {...props} />, image: '/demo/alcohol.jpg', description: 'Luxury beverage packaging', clients: ['Fine Spirits Inc.', 'Wine Masters', 'Elite Distillers'] },
-    { name: 'Perfume', icon: (props) => <FlaskConical {...props} />, image: '/demo/perfume.jpg', description: 'Elegant fragrance packaging', clients: ['Scented Elegance', 'Perfume House', 'Aroma Luxe'] },
-    { name: 'Flowers', icon: (props) => <Flower2 {...props} />, image: '/demo/flowers.jpg', description: 'Sophisticated floral packaging', clients: ['Floral Artistry', 'Petal Boutique', 'Luxury Blooms'] },
-    { name: 'Restaurants', icon: (props) => <Utensils {...props} />, image: '/demo/restaurants.jpg', description: 'Fine dining packaging', clients: ['Gourmet Table', 'Epicurean Delights', 'Chef’s Choice'] },
-    { name: 'Hotels', icon: (props) => <Hotel {...props} />, image: '/demo/hotels.jpg', description: 'Luxury hospitality packaging', clients: ['Grand Palace Hotel', 'Elite Suites', 'Boutique Inn'] },
-    { name: 'Universities', icon: (props) => <GraduationCap {...props} />, image: '/demo/universities.jpg', description: 'Academic institution packaging', clients: ['Prestige University', 'Scholars College', 'Elite Academy'] },
-    { name: 'Schools', icon: (props) => <BookOpen {...props} />, image: '/demo/schools.jpg', description: 'Educational packaging solutions', clients: ['Bright Future School', 'Learning Tree', 'Scholastic Prep'] },
-    { name: 'Chocolates & Sweets', icon: (props) => <Candy {...props} />, image: '/demo/chocolates.jpg', description: 'Gourmet confectionery packaging', clients: ['ChocoDelight', 'Sweet Temptations', 'Luxury Confections'] },
-    { name: 'Watches', icon: (props) => <Watch {...props} />, image: '/demo/watches.jpg', description: 'Premium timepiece packaging', clients: ['Timepiece Masters', 'Luxury Watch Co.', 'Elite Horology'] },
-    { name: 'Promotional Items', icon: (props) => <Gift {...props} />, image: '/demo/promo.jpg', description: 'Custom promotional packaging', clients: ['PromoGenius', 'Brand Boosters', 'Elite Promotions'] },
-  ];
+
+
+  //   { name: 'Flowers', icon: (props) => <Flower2 {...props} />, image: '/demo/flowers.jpg', description: 'Sophisticated floral packaging', clients: ['Floral Artistry', 'Petal Boutique', 'Luxury Blooms'] },
+  //   { name: 'Restaurants', icon: (props) => <Utensils {...props} />, image: '/demo/restaurants.jpg', description: 'Fine dining packaging', clients: ['Gourmet Table', 'Epicurean Delights', 'Chef’s Choice'] },
+  //   { name: 'Hotels', icon: (props) => <Hotel {...props} />, image: '/demo/hotels.jpg', description: 'Luxury hospitality packaging', clients: ['Grand Palace Hotel', 'Elite Suites', 'Boutique Inn'] },
+  //   { name: 'Universities', icon: (props) => <GraduationCap {...props} />, image: '/demo/universities.jpg', description: 'Academic institution packaging', clients: ['Prestige University', 'Scholars College', 'Elite Academy'] },
+  //   { name: 'Schools', icon: (props) => <BookOpen {...props} />, image: '/demo/schools.jpg', description: 'Educational packaging solutions', clients: ['Bright Future School', 'Learning Tree', 'Scholastic Prep'] },
+  //   { name: 'Chocolates & Sweets', icon: (props) => <Candy {...props} />, image: '/demo/chocolates.jpg', description: 'Gourmet confectionery packaging', clients: ['ChocoDelight', 'Sweet Temptations', 'Luxury Confections'] },
+  //   { name: 'Watches', icon: (props) => <Watch {...props} />, image: '/demo/watches.jpg', description: 'Premium timepiece packaging', clients: ['Timepiece Masters', 'Luxury Watch Co.', 'Elite Horology'] },
+  //   { name: 'Promotional Items', icon: (props) => <Gift {...props} />, image: '/demo/promo.jpg', description: 'Custom promotional packaging', clients: ['PromoGenius', 'Brand Boosters', 'Elite Promotions'] },
+  // ];
 
   const featuredClients = [
     'LADERACH',
@@ -113,7 +110,6 @@ export default function Home() {
 
   const handleOpenExpertiseModal = () => {
     setShowExpertiseModal(true);
-    setSelectedCategory(null);
     setShowClientsTab(true);
   };
 
@@ -613,5 +609,5 @@ export default function Home() {
         <MessageCircle size={36} className="text-genius-cream" />
       </a>
     </div>
-  )
+  );
 }
