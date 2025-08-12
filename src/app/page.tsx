@@ -2,23 +2,9 @@
 // TODO : ADD BACGROUND TO HERO SECTION, MAKE THE CATEGORIES OF THE BUSINESS IN THE MAIN PAGE AS WELLL
 import { ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 
-// Add CigarIcon SVG component
-const CigarIcon = ({ size = 36, color = '#7E6A52' }) => (
-  <svg width={size} height={size} viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="6" y="15" width="20" height="6" rx="3" fill={color} stroke="#3A2B20" strokeWidth="2"/>
-    <rect x="26" y="16" width="4" height="4" rx="2" fill="#B89C82" stroke="#3A2B20" strokeWidth="1.5"/>
-    <path d="M30 18c2 0 2-4 0-4" stroke="#DACFB6" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-);
 
-type Category = {
-  name: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
-  image: string;
-  description: string;
-  clients: string[];
-};
 
 export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
@@ -62,8 +48,7 @@ export default function Home() {
   //   { name: 'Schools', icon: (props) => <BookOpen {...props} />, image: '/demo/schools.jpg', description: 'Educational packaging solutions', clients: ['Bright Future School', 'Learning Tree', 'Scholastic Prep'] },
   //   { name: 'Chocolates & Sweets', icon: (props) => <Candy {...props} />, image: '/demo/chocolates.jpg', description: 'Gourmet confectionery packaging', clients: ['ChocoDelight', 'Sweet Temptations', 'Luxury Confections'] },
   //   { name: 'Watches', icon: (props) => <Watch {...props} />, image: '/demo/watches.jpg', description: 'Premium timepiece packaging', clients: ['Timepiece Masters', 'Luxury Watch Co.', 'Elite Horology'] },
-  //   { name: 'Promotional Items', icon: (props) => <Gift {...props} />, image: '/demo/promo.jpg', description: 'Custom promotional packaging', clients: ['PromoGenius', 'Brand Boosters', 'Elite Promotions'] },
-  // ];
+
 
   const featuredClients = [
     'LADERACH',
@@ -441,10 +426,12 @@ export default function Home() {
                     ].map((imagePath, index) => (
                       <div key={index} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
                         <div className="aspect-[4/5] relative overflow-hidden">
-                          <img 
+                          <Image 
                             src={imagePath} 
                             alt={`Luxury Packaging Collection ${index + 1}`}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
@@ -475,10 +462,12 @@ export default function Home() {
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item) => (
               <div key={item} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
                 <div className="aspect-[4/5] relative overflow-hidden">
-                  <img 
+                  <Image 
                     src={`/${item}.jpg`} 
                     alt={`Luxury Packaging Collection ${item}`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
@@ -549,10 +538,12 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <img 
+                <Image 
                   src="/GT LOGO.png" 
                   alt="GeniusTouch Logo" 
-                  className="h-8 w-auto shadow-md"
+                  width={32}
+                  height={32}
+                  className="shadow-md"
                 />
                 <span className="font-serif text-xl font-semibold text-genius-cream">GeniusTouch</span>
               </div>
