@@ -1,7 +1,7 @@
 "use client";
 // TODO : ADD BACGROUND TO HERO SECTION, MAKE THE CATEGORIES OF THE BUSINESS IN THE MAIN PAGE AS WELLL
 import { ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 
 
@@ -55,8 +55,8 @@ function CategoryGallery({ folder }: { folder: string }) {
         if (!res.ok) throw new Error('Failed to load images');
         const data = await res.json();
         if (!cancelled) setImages(Array.isArray(data.images) ? data.images : []);
-      } catch (err: any) {
-        if (!cancelled) setError(err?.message ?? 'Error loading images');
+      } catch (err: unknown) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Error loading images');
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -103,51 +103,7 @@ function CategoryGallery({ folder }: { folder: string }) {
   );
 }
 
-function CategoryThumbnail({ title, folder }: { title: string; folder: string }) {
-  const [thumb, setThumb] = React.useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetch(`/api/category-images?folder=${encodeURIComponent(folder)}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const first: string | undefined = Array.isArray(data.images) ? data.images[0] : undefined;
-        if (!cancelled) setThumb(first ?? null);
-      } catch (_) {
-        // ignore
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, [folder]);
-
-  return (
-    <div className="group text-left luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
-      <div className="aspect-[4/5] relative overflow-hidden">
-        {thumb ? (
-          <Image 
-            src={thumb}
-            alt={`${title} banner`}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            priority={false}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-genius-dark via-genius-brown to-genius-tan" />
-        )}
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="absolute inset-x-0 bottom-0 p-4">
-          <div className="bg-genius-dark/70 text-genius-cream backdrop-blur-md rounded-xl px-4 py-3 text-center text-lg font-serif">
-            {title}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ClientLogo({ name, src }: { name: string; src?: string }) {
   const [loaded, setLoaded] = React.useState(false);
@@ -225,13 +181,12 @@ export default function Home() {
   //   { name: 'Watches', icon: (props) => <Watch {...props} />, image: '/demo/watches.jpg', description: 'Premium timepiece packaging', clients: ['Timepiece Masters', 'Luxury Watch Co.', 'Elite Horology'] },
 
 
-  const featuredClients = FEATURED_CLIENTS;
+
 
   // Client logos are expected in /public/ClientLogos and are loaded dynamically.
 
   const [orderedFeaturedClients, setOrderedFeaturedClients] = useState<string[]>(FEATURED_CLIENTS);
   const [clientLogoMap, setClientLogoMap] = useState<Record<string, string>>({});
-  const hasLoadedLogos = useRef(false);
 
   useEffect(() => {
     // If we already have cached data, use it immediately

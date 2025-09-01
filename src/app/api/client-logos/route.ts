@@ -10,7 +10,7 @@ export async function GET() {
     // Provide both full filenames and normalized basenames for matching
     const baseNamesLower = files.map((name) => path.parse(name).name.toLowerCase());
     return NextResponse.json({ files, baseNamesLower });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ files: [], baseNamesLower: [] });
   }
 }
