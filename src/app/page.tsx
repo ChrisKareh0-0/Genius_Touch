@@ -1,10 +1,184 @@
 "use client";
 // TODO : ADD BACGROUND TO HERO SECTION, MAKE THE CATEGORIES OF THE BUSINESS IN THE MAIN PAGE AS WELLL
 import { ArrowLeft, MessageCircle, X, Menu } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 
 
+
+const FEATURED_CLIENTS: string[] = [
+  'LADERACH',
+  'BOLD',
+  'CHRIS HARRIS',
+  'FATEN',
+  'SAKINA',
+  'BARRAQ',
+  'MERCEDES BENZ',
+  'UNIFAB',
+  'GANACHE',
+  'KHAN AL SABOUN',
+  'HANDY',
+  'WOROOD',
+  'BONDS',
+  'LA ROSE',
+  'QINWAN',
+  'FIDEL',
+  'ESA BUSINESS SCHOOL',
+  'RIBBON',
+  'MANOLIA',
+  'NDU',
+  'LA PRALINE',
+  'AUST',
+  'SERAF',
+  "MOULIN D'OR",
+  'DORE',
+  'GLOBAL UNIVERSITY',
+  'RCHIDEE'
+];
+
+// Global flag to prevent multiple API calls
+let isLoadingLogos = false;
+let logoCache: { map: Record<string, string>; orderedClients: string[] } | null = null;
+
+function CategoryGallery({ folder }: { folder: string }) {
+  const [images, setImages] = React.useState<string[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/category-images?folder=${encodeURIComponent(folder)}`);
+        if (!res.ok) throw new Error('Failed to load images');
+        const data = await res.json();
+        if (!cancelled) setImages(Array.isArray(data.images) ? data.images : []);
+      } catch (err: any) {
+        if (!cancelled) setError(err?.message ?? 'Error loading images');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [folder]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12 text-genius-cream/80">Loading…</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-genius-cream/80">{error}</div>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <div className="text-center py-8 text-genius-cream/80">No images found in this category.</div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {images.map((src, index) => (
+        <div key={src} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
+          <div className="aspect-[4/5] relative overflow-hidden">
+            <Image 
+              src={src}
+              alt={`${folder} ${index + 1}`}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CategoryThumbnail({ title, folder }: { title: string; folder: string }) {
+  const [thumb, setThumb] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch(`/api/category-images?folder=${encodeURIComponent(folder)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const first: string | undefined = Array.isArray(data.images) ? data.images[0] : undefined;
+        if (!cancelled) setThumb(first ?? null);
+      } catch (_) {
+        // ignore
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [folder]);
+
+  return (
+    <div className="group text-left luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
+      <div className="aspect-[4/5] relative overflow-hidden">
+        {thumb ? (
+          <Image 
+            src={thumb}
+            alt={`${title} banner`}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            priority={false}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-genius-dark via-genius-brown to-genius-tan" />
+        )}
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <div className="bg-genius-dark/70 text-genius-cream backdrop-blur-md rounded-xl px-4 py-3 text-center text-lg font-serif">
+            {title}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClientLogo({ name, src }: { name: string; src?: string }) {
+  const [loaded, setLoaded] = React.useState(false);
+  return (
+    <div className="w-full h-32 flex items-center justify-center">
+      <div className="relative w-full h-full max-h-28">
+        {!loaded && src && (
+          <div className="absolute top-2 right-2 z-10">
+            <div className="w-5 h-5 rounded-full border-2 border-genius-cream/40 border-t-genius-cream animate-spin" aria-label="Loading logo" />
+          </div>
+        )}
+        {src ? (
+          <Image
+            src={src}
+            alt={`${name} logo`}
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 33vw"
+            onLoadingComplete={() => setLoaded(true)}
+            onError={() => setLoaded(false)}
+          />
+        ) : null}
+        {!src && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xl font-serif font-semibold text-genius-light text-center">{name}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [showContactForm, setShowContactForm] = useState(false);
@@ -12,6 +186,7 @@ export default function Home() {
   const [showClientsTab, setShowClientsTab] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<{ title: string; folder: string } | null>(null);
   
   // Array of video sources - memoized to prevent re-creation on every render
   const videoSources = useMemo(() => [
@@ -50,35 +225,79 @@ export default function Home() {
   //   { name: 'Watches', icon: (props) => <Watch {...props} />, image: '/demo/watches.jpg', description: 'Premium timepiece packaging', clients: ['Timepiece Masters', 'Luxury Watch Co.', 'Elite Horology'] },
 
 
-  const featuredClients = [
-    'LADERACH',
-    'BOLD',
-    'CHRIS HARRIS',
-    'FATEN',
-    'SAKINA',
-    'BARRAQ',
-    'MERCEDES BENZ',
-    'UNIFAB',
-    'GANACHE',
-    'KHAN AL SABOUN',
-    'HANDY',
-    'WOROOD',
-    'BONDS',
-    'LA ROSE',
-    'QINWAN',
-    'FIDEL',
-    'ESA BUSINESS SCHOOL',
-    'RIBBON',
-    'MANOLIA',
-    'NDU',
-    'LA PRALINE',
-    'AUST',
-    'SERAF',
-    "MOULIN D'OR",
-    'DORE',
-    'GLOBAL UNIVERSITY',
-    'RCHIDEE'
-  ];
+  const featuredClients = FEATURED_CLIENTS;
+
+  // Client logos are expected in /public/ClientLogos and are loaded dynamically.
+
+  const [orderedFeaturedClients, setOrderedFeaturedClients] = useState<string[]>(FEATURED_CLIENTS);
+  const [clientLogoMap, setClientLogoMap] = useState<Record<string, string>>({});
+  const hasLoadedLogos = useRef(false);
+
+  useEffect(() => {
+    // If we already have cached data, use it immediately
+    if (logoCache) {
+      console.log('Using cached logo data');
+      setClientLogoMap(logoCache.map);
+      setOrderedFeaturedClients(logoCache.orderedClients);
+      return;
+    }
+
+    // If already loading, don't start another request
+    if (isLoadingLogos) {
+      console.log('Logo loading already in progress, skipping...');
+      return;
+    }
+
+    console.log('Starting logo loading...');
+    isLoadingLogos = true;
+
+    async function loadLogos() {
+      try {
+        console.log('Fetching client logos...');
+        const res = await fetch('/api/client-logos');
+        const data = await res.json();
+        const { files } = data as { files: string[] };
+        
+        // Build a lookup from normalized name to file
+        const fileByBaseLower: Record<string, string> = {};
+        for (const f of files) {
+          const base = f.replace(/\.[^.]+$/, '');
+          fileByBaseLower[base.toLowerCase()] = f;
+        }
+        const map: Record<string, string> = {};
+        const withLogo: string[] = [];
+        const withoutLogo: string[] = [];
+        for (const name of FEATURED_CLIENTS) {
+          const dashed = name.toLowerCase().replace(/\s+/g, '-');
+          const candidates = [name.toLowerCase(), dashed];
+          let matched: string | undefined;
+          for (const c of candidates) {
+            if (fileByBaseLower[c]) { matched = fileByBaseLower[c]; break; }
+          }
+          if (matched) {
+            map[name] = `/ClientLogos/${matched}`;
+            withLogo.push(name);
+          } else {
+            withoutLogo.push(name);
+          }
+        }
+        
+        // Cache the results globally
+        logoCache = { map, orderedClients: [...withLogo, ...withoutLogo] };
+        
+        console.log('Logo loading completed, updating state...');
+        setClientLogoMap(map);
+        setOrderedFeaturedClients([...withLogo, ...withoutLogo]);
+      } catch (error) {
+        console.error('Error loading logos:', error);
+        setClientLogoMap({});
+        setOrderedFeaturedClients(FEATURED_CLIENTS);
+      } finally {
+        isLoadingLogos = false;
+      }
+    }
+    loadLogos();
+  }, []);
 
   const handleScrollToContact = () => {
     const contactSection = document.getElementById('contact');
@@ -96,6 +315,7 @@ export default function Home() {
   const handleOpenExpertiseModal = () => {
     setShowExpertiseModal(true);
     setShowClientsTab(true);
+    setSelectedCategory(null);
   };
 
   return (
@@ -190,7 +410,7 @@ export default function Home() {
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
             style={{ 
               filter: 'brightness(0.7) contrast(1.1)',
-              transform: 'scale(1.1)',
+              transform: 'scale(1.2)',
               zIndex: 5
             }}
           >
@@ -328,7 +548,7 @@ export default function Home() {
                   {/* Tab Navigation */}
                   <div className="flex space-x-1 mt-4">
                     <button
-                      onClick={() => { setShowClientsTab(true); }}
+                      onClick={() => { setShowClientsTab(true); setSelectedCategory(null); }}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         showClientsTab
                           ? 'bg-genius-light/30 text-genius-light'
@@ -371,13 +591,12 @@ export default function Home() {
                   </div>
                   
                   <div className="grid md:grid-cols-3 gap-8 mb-8">
-                    {featuredClients.map((client: string, index: number) => (
+                    {orderedFeaturedClients.map((client: string, index: number) => (
                       <div key={index} className="group">
                         <div className="bg-gradient-to-br from-genius-light/10 to-genius-cream/20 rounded-2xl p-8 border border-genius-light/20 hover:border-genius-cream/40 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                          <div className="text-center">
-                            <h4 className="text-xl font-serif font-semibold text-genius-light">
+                          <ClientLogo name={client} src={clientLogoMap[client]} />
+                          <div className="mt-3 text-center text-genius-cream/90 font-serif text-sm md:text-base">
                               {client}
-                            </h4>
                           </div>
                         </div>
                       </div>
@@ -385,59 +604,65 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                // Portfolio Gallery view
+                // Portfolio Gallery view (Categories)
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <h3 className="text-3xl font-serif font-medium text-genius-light mb-4">
-                      Portfolio Gallery
+                      {selectedCategory ? selectedCategory.title : 'Portfolio Gallery'}
                     </h3>
                     <p className="text-genius-cream/80 text-lg">
-                      Explore our comprehensive collection of luxury packaging designs
+                      {selectedCategory ? 'Tap an image to view larger' : 'Browse by category'}
                     </p>
+                    {selectedCategory && (
+                      <div className="mt-4">
+                        <button
+                          className="inline-flex items-center px-4 py-2 rounded-xl border border-genius-cream/30 text-genius-light hover:bg-genius-light/10 transition-colors"
+                          onClick={() => setSelectedCategory(null)}
+                        >
+                          <ArrowLeft size={18} className="mr-2" /> Back to Categories
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
+                  {!selectedCategory ? (
                   <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {[
-                      '/footages/170.jpg', '/footages/152.jpg', '/footages/201.jpg', '/footages/194.jpg',
-                      '/footages/139.jpg', '/footages/190.jpg', '/footages/191.jpg', '/footages/215.jpg',
-                      '/footages/180.jpg', '/footages/119.jpg', '/footages/149.jpg', '/footages/156.jpg',
-                      '/footages/178.jpg', '/footages/179.jpg', '/footages/167.jpg', '/footages/143.jpg',
-                      '/footages/158.jpg', '/footages/189.jpg', '/footages/209.jpg', '/footages/199.jpg',
-                      '/footages/137.jpg', '/footages/196.jpg', '/footages/214.jpg', '/footages/203.jpg',
-                      '/footages/186.jpg', '/footages/198.jpg', '/footages/187.jpg', '/footages/219.jpg',
-                      '/footages/142.jpg', '/footages/161.jpg', '/footages/172.jpg', '/footages/211.jpg',
-                      '/footages/165.jpg', '/footages/177.jpg', '/footages/141.jpg', '/footages/220.jpg',
-                      '/footages/122.jpg', '/footages/140.jpg', '/footages/151.jpg', '/footages/147.jpg',
-                      '/footages/129.jpg', '/footages/206.jpg', '/footages/133.jpg', '/footages/176.jpg',
-                      '/footages/128.jpg', '/footages/208.jpg', '/footages/193.jpg', '/footages/126.jpg',
-                      '/footages/210.jpg', '/footages/212.jpg', '/footages/218.jpg', '/footages/154.jpg',
-                      '/footages/205.jpg', '/footages/120.jpg', '/footages/123.jpg', '/footages/168.jpg',
-                      '/footages/188.jpg', '/footages/131.jpg', '/footages/118.jpg', '/footages/134.jpg',
-                      '/footages/135.jpg', '/footages/166.jpg', '/footages/138.jpg', '/footages/150.jpg',
-                      '/footages/116.jpg', '/footages/200.jpg', '/footages/130.jpg', '/footages/163.jpg',
-                      '/footages/121.jpg', '/footages/192.jpg', '/footages/171.jpg', '/footages/159.jpg',
-                      '/footages/153.jpg', '/footages/117.jpg', '/footages/195.jpg', '/footages/217.jpg',
-                      '/footages/160.jpg', '/footages/144.jpg', '/footages/174.jpg', '/footages/136.jpg',
-                      '/footages/213.jpg', '/footages/125.jpg', '/footages/146.jpg', '/footages/124.jpg',
-                      '/footages/197.jpg', '/footages/164.jpg', '/footages/175.jpg', '/footages/145.jpg',
-                      '/footages/173.jpg', '/footages/221.jpg', '/footages/169.jpg', '/footages/162.jpg',
-                      '/footages/185.jpg', '/footages/157.jpg', '/footages/127.jpg', '/footages/207.jpg',
-                      '/footages/216.jpg', '/footages/155.jpg', '/footages/148.jpg', '/footages/132.jpg'
-                    ].map((imagePath, index) => (
-                      <div key={index} className="group luxury-hover bg-genius-cream/60 backdrop-blur-xl border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
-                        <div className="aspect-[4/5] relative overflow-hidden">
-                          <Image 
-                            src={imagePath} 
-                            alt={`Luxury Packaging Collection ${index + 1}`}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        { title: 'Chocolate & Sweet Boxes', folder: 'chocolate-and-sweet-boxes' },
+                        { title: 'Cigar Boxes', folder: 'cigar-boxes' },
+                        { title: 'Different Boxes', folder: 'different-boxes' },
+                        { title: 'Flowers Boxes', folder: 'flowers-boxes' },
+                        { title: 'Perfume Boxes', folder: 'perfume-boxes' },
+                        { title: 'Restaurant & Hotel', folder: 'restaurant-and-hotel' },
+                        { title: 'Universities', folder: 'universities' },
+                        { title: 'Wine and Others', folder: 'wine-and-others' },
+                      ].map((category, index) => (
+                        <button
+                          key={index}
+                          className="overflow-hidden rounded-2xl"
+                          onClick={() => setSelectedCategory(category)}
+                        >
+                          <div className="group text-left luxury-hover bg-gradient-to-br from-genius-dark via-genius-brown to-genius-tan border border-genius-tan/40 rounded-2xl shadow-lg overflow-hidden">
+                            <div className="bg-black/30 p-3">
+                              <div
+                                className={`bg-genius-dark/70 text-genius-cream backdrop-blur-md rounded-xl px-4 py-2 text-center font-serif whitespace-nowrap ${
+                                  category.title.length > 26
+                                    ? 'text-xs md:text-sm'
+                                    : category.title.length > 18
+                                    ? 'text-sm md:text-base'
+                                    : 'text-base md:text-lg'
+                                }`}
+                              >
+                                {category.title}
+                              </div>
                         </div>
                       </div>
+                        </button>
                     ))}
                   </div>
+                  ) : (
+                    <CategoryGallery folder={selectedCategory.folder} />
+                  )}
                 </div>
               )}
 
